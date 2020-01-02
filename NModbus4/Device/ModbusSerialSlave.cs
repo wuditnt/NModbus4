@@ -88,6 +88,9 @@ namespace Modbus.Device
                     {
                         // read request and build message
                         byte[] frame = SerialTransport.ReadRequest();
+
+                        RaiseRequest(frame, null);
+                        
                         IModbusMessage request = ModbusMessageFactory.CreateModbusRequest(frame);
 
                         if (SerialTransport.CheckFrame && !SerialTransport.ChecksumsMatch(request, frame))
@@ -111,22 +114,35 @@ namespace Modbus.Device
                         IModbusMessage response = ApplyRequest(request);
 
                         // write response
-                        SerialTransport.Write(response);
+                        byte[] responseFrame = SerialTransport.Write(response);
+
+                        RaiseResponse(responseFrame, null);
+
+
                     }
                     catch (IOException ioe)
                     {
-                        Debug.WriteLine("IO Exception encountered while listening for requests - {0}", ioe.Message);
+                        Debug.WriteLine($"IO Exception encountered while listening for requests - {ioe.Message}");
                         SerialTransport.DiscardInBuffer();
                     }
                     catch (TimeoutException te)
                     {
-                        Debug.WriteLine("Timeout Exception encountered while listening for requests - {0}", te.Message);
+                        Debug.WriteLine($"Timeout Exception encountered while listening for requests - {te.Message}");
                         SerialTransport.DiscardInBuffer();
                     }
-
+                    catch(FormatException fe)
+                    {
+                        Debug.WriteLine($"协议格式错误 - {fe.Message}");
+                        SerialTransport.DiscardInBuffer();
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.WriteLine($"异常 - {ex.Message}");
+                        SerialTransport.DiscardInBuffer();
+                    }
                     // TODO better exception handling here, missing FormatException, NotImplemented...
                 }
-                catch (InvalidOperationException)
+                catch (Exception)
                 {
                     // when the underlying transport is disposed
                     break;

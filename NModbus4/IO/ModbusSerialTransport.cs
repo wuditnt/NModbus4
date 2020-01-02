@@ -35,13 +35,15 @@ namespace Modbus.IO
             StreamResource.DiscardInBuffer();
         }
 
-        internal override void Write(IModbusMessage message)
+        internal override byte[] Write(IModbusMessage message)
         {
             DiscardInBuffer();
 
             byte[] frame = BuildMessageFrame(message);
             Debug.WriteLine("TX: {0}", string.Join(", ", frame));
             StreamResource.Write(frame, 0, frame.Length);
+
+            return frame;
         }
 
         internal override IModbusMessage CreateResponse<T>(byte[] frame)

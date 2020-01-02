@@ -23,10 +23,10 @@ namespace Modbus.IO
             Debug.Assert(streamResource != null, "Argument streamResource cannot be null.");
         }
 
-        public static int RequestBytesToRead(byte[] frameStart)
+        public static bool RequestBytesToRead(byte[] frameStart, out int numBytes)
         {
             byte functionCode = frameStart[1];
-            int numBytes;
+            numBytes = 1;
 
             switch (functionCode)
             {
@@ -48,10 +48,12 @@ namespace Modbus.IO
                     string errorMessage = String.Format(CultureInfo.InvariantCulture, "Function code {0} not supported.",
                         functionCode);
                     Debug.WriteLine(errorMessage);
-                    throw new NotImplementedException(errorMessage);
+
+                    return false;
+                   // throw new NotImplementedException(errorMessage);
             }
 
-            return numBytes;
+            return true;
         }
 
         public static int ResponseBytesToRead(byte[] frameStart)
@@ -130,11 +132,21 @@ namespace Modbus.IO
         internal override byte[] ReadRequest()
         {
             byte[] frameStart = Read(RequestFrameStartLength);
-            byte[] frameEnd = Read(RequestBytesToRead(frameStart));
-            byte[] frame = Enumerable.Concat(frameStart, frameEnd).ToArray();
-            Debug.WriteLine("RX: {0}", string.Join(", ", frame));
 
-            return frame;
+            bool res = RequestBytesToRead(frameStart, out int numBytes);
+
+            if (res)
+            {
+                byte[] frameEnd = Read(numBytes);
+                byte[] frame = Enumerable.Concat(frameStart, frameEnd).ToArray();
+                Debug.WriteLine("RX: {0}", string.Join(", ", frame));
+                return frame;
+            }
+            else
+            {
+                return frameStart;
+            }
+            
         }
     }
 }

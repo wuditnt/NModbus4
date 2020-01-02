@@ -257,7 +257,7 @@ namespace Modbus.IO
 
         internal abstract byte[] BuildMessageFrame(IModbusMessage message);
 
-        internal abstract void Write(IModbusMessage message);
+        internal abstract byte[] Write(IModbusMessage message);
 
         /// <summary>
         ///     Releases unmanaged and - optionally - managed resources

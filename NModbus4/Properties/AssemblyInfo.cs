@@ -5,19 +5,17 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("NModbus4")]
 [assembly: AssemblyProduct("NModbus4")]
-[assembly: AssemblyCompany("Maxwe11")]
+[assembly: AssemblyCompany("Ó¢ÌØË¼Èð")]
 [assembly: AssemblyCopyright("Licensed under MIT License.")]
-[assembly: AssemblyDescription("NModbus is a C# implementation of the Modbus protocol. " +
-           "Provides connectivity to Modbus slave compatible devices and applications. " +
-           "Supports serial ASCII, serial RTU, TCP, and UDP protocols. "+
-           "NModbus4 it's a fork of NModbus(https://code.google.com/p/nmodbus)")]
+[assembly: AssemblyDescription("Modify by wuditnt")]
 
 [assembly: CLSCompliant(false)]
 [assembly: Guid("95B2AE1E-E0DC-4306-8431-D81ED10A2D5D")]
-[assembly: AssemblyVersion("2.1.0.0")]
+[assembly: AssemblyVersion("2.1.2019.12")]
 [assembly: AssemblyInformationalVersion("2.1.0-dev")]
 
 #if !SIGNED
 [assembly: InternalsVisibleTo(@"Modbus.UnitTests")]
 [assembly: InternalsVisibleTo(@"DynamicProxyGenAssembly2")]
+[assembly: AssemblyFileVersion("2.1.2019.12")]
 #endif

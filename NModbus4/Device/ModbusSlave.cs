@@ -13,6 +13,13 @@ namespace Modbus.Device
     using Unme.Common;
 
     /// <summary>
+    /// 通信的事件委托
+    /// </summary>
+    /// <param name="frame">数据帧</param>
+    /// <param name="option">附加信息</param>
+    public delegate void CommunicationEventHandler(byte[] frame, object option);
+
+    /// <summary>
     ///     Modbus slave device.
     /// </summary>
     public abstract class ModbusSlave : ModbusDevice
@@ -35,6 +42,39 @@ namespace Modbus.Device
         /// </summary>
         /// <remarks>For Read/Write Multiple registers (function code 23), this method is raised after writing and before reading.</remarks>
         public event EventHandler<ModbusSlaveRequestEventArgs> WriteComplete;
+
+        /// <summary>
+        /// 请求事件
+        /// </summary>
+        public event CommunicationEventHandler OnRequest;
+
+
+        /// <summary>
+        /// 回复事件
+        /// </summary>
+        public event CommunicationEventHandler OnResponse;
+
+
+        /// <summary>
+        /// 激发请求事件
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="option"></param>
+        protected virtual void RaiseRequest(byte[] frame, object option)
+        {
+            OnRequest?.Invoke(frame, option);
+        }
+
+        /// <summary>
+        /// 激发回复事件
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="option"></param>
+        protected virtual void RaiseResponse(byte[] frame, string option)
+        {
+            OnResponse?.Invoke(frame, option);
+        }
+
 
         /// <summary>
         ///     Gets or sets the data store.
@@ -117,7 +157,7 @@ namespace Modbus.Device
                 Debug.WriteLine(request.ToString());
                 var eventArgs = new ModbusSlaveRequestEventArgs(request);
                 ModbusSlaveRequestReceived.Raise(this, eventArgs);
-
+                
                 switch (request.FunctionCode)
                 {
                     case Modbus.ReadCoils:

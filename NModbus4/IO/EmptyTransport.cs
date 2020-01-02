@@ -23,7 +23,7 @@
             throw new NotImplementedException();
         }
 
-        internal override void Write(IModbusMessage message)
+        internal override byte[] Write(IModbusMessage message)
         {
             throw new NotImplementedException();
         }

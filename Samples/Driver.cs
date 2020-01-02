@@ -1,5 +1,6 @@
 using System;
 using System.IO.Ports;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -30,7 +31,9 @@ namespace MySample
                 //ModbusSerialAsciiMasterReadRegistersFromModbusSlave();
                 //StartModbusTcpSlave();
                 //StartModbusUdpSlave();
-                //StartModbusAsciiSlave();
+                //StartModbusAsciiSlave();¡¢
+
+                StartModbusSerialRtuSlave();
             }
             catch (Exception e)
             {
@@ -166,7 +169,7 @@ namespace MySample
                 // create modbus slave
                 ModbusSlave slave = ModbusSerialSlave.CreateAscii(unitId, slavePort);
                 slave.DataStore = DataStoreFactory.CreateDefaultDataStore();
-
+               // slave.ModbusSlaveRequestReceived
                 slave.Listen();
             }
         }
@@ -176,7 +179,7 @@ namespace MySample
         /// </summary>
         public static void StartModbusSerialRtuSlave()
         {
-            using (SerialPort slavePort = new SerialPort("COM2"))
+            using (SerialPort slavePort = new SerialPort("COM1"))
             {
                 // configure serial port
                 slavePort.BaudRate = 9600;
@@ -191,9 +194,28 @@ namespace MySample
                 ModbusSlave slave = ModbusSerialSlave.CreateRtu(unitId, slavePort);
                 slave.DataStore = DataStoreFactory.CreateDefaultDataStore();
 
+                slave.ModbusSlaveRequestReceived += Slave_ModbusSlaveRequestReceived;
+                slave.DataStore.DataStoreReadFrom += DataStore_DataStoreReadFrom;
+
+                
                 slave.Listen();
             }
         }
+
+        private static void DataStore_DataStoreReadFrom(object sender, DataStoreEventArgs e)
+        {
+            if (e.ModbusDataType == ModbusDataType.HoldingRegister || e.ModbusDataType == ModbusDataType.InputRegister)
+            {
+                ushort[] tt = e.Data.B.ToArray();
+            }
+            
+        }
+
+        private static void Slave_ModbusSlaveRequestReceived(object sender, ModbusSlaveRequestEventArgs e)
+        {
+            Console.WriteLine(e.Message.ToString());
+        }
+
 
         /// <summary>
         ///     Simple Modbus serial USB ASCII slave example.
